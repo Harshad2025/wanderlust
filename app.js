@@ -94,7 +94,9 @@ app.use((req, res, next) => {
 app.use("/listings/:id/reviews", riviewRoutes);
 app.use("/", userRoutes);
 
-
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
 app.use((req, res, next) => {
     next(new ExpressError(404, 'Page Not Found'));
 });
