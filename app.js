@@ -1,6 +1,10 @@
 if(process.env.NODE_ENV !== "production"){
     require('dotenv').config();
 }
+process.on("uncaughtException", (err) => {
+    console.error("UNCAUGHT EXCEPTION:");
+    console.error(err.stack);
+});
 
 const port = process.env.PORT || 8080;
 const express = require('express');
@@ -54,6 +58,9 @@ const store = MongoStore.create({
     },
     touchAfter: 24 * 3600
 });
+store.on("error", function(e){
+    console.log("SESSION STORE ERROR", e);
+});
 
 const sessionConfig = {
     store,
@@ -101,8 +108,14 @@ app.use((req, res, next) => {
     next(new ExpressError(404, 'Page Not Found'));
 });
 app.use((err, req, res, next) => {
-    let { statusCode=500,message="Something went wrong" } = err;
-    res.status(statusCode).render("error.ejs",{message});
+    console.error(err.stack);
+
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    let { statusCode = 500, message = "Something went wrong" } = err;
+    res.status(statusCode).render("error.ejs", { message });
 });
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
