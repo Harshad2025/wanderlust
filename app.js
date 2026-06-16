@@ -58,9 +58,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //     },
 //     touchAfter: 24 * 3600
 // });
-store.on("error", function(e){
-    console.log("SESSION STORE ERROR", e);
-});
+
 
 const sessionConfig = {
     secret: process.env.SECRET,
